@@ -7,11 +7,10 @@ import (
 	"os"
 	"runtime"
 	//"io"
-	//"gitorious.org/goqa/goqa.git"
-	"../../goQA"
 	"time"
 	//"net"
 	//"encoding/json"
+	"github.com/go-QA/logger"
 )
 
 func main() {
@@ -32,25 +31,25 @@ func main() {
 	if err != nil { panic(err) }
 	defer resultLog.Close()
 
-	logger := goQA.GoQALog{}
-	logger.Init()
-	logger.SetDebug(true)
+	log := goQA.GoQALog{}
+	log.Init()
+	log.SetDebug(true)
 
-	logger.Add("default", goQA.LOGLEVEL_ALL, os.Stdout)
-	logger.Add("Console", goQA.LOGLEVEL_MESSAGE, console)
-	logger.Add("Error", goQA.LOGLEVEL_ERROR, errLog)
-	logger.Add("Incidents", goQA.LOGLEVEL_WARNING, incedentLog)
-	logger.Add("Resuts", goQA.LOGLEVEL_PASS_FAIL, resultLog)
+	log.Add("default", logger.LOGLEVEL_ALL, os.Stdout)
+	log.Add("Console", logger.LOGLEVEL_MESSAGE, console)
+	log.Add("Error", logger.LOGLEVEL_ERROR, errLog)
+	log.Add("Incidents", logger.LOGLEVEL_WARNING, incedentLog)
+	log.Add("Resuts", logger.LOGLEVEL_PASS_FAIL, resultLog)
 
-	logger.LogMessage("running on platform %s", runtime.GOOS)
-	logger.LogMessage("First message")
-	logger.LogMessage("second message")
-	logger.LogMessage("third message")
-	logger.LogDebug("Debug message")
-	logger.LogWarning("Warning Will Robinson")
-	logger.LogPass("Test Passed")
-	logger.LogFail("Test Failed")
-	logger.LogError("Failure in script")
+	log.LogMessage("running on platform %s", runtime.GOOS)
+	log.LogMessage("First message")
+	log.LogMessage("second message")
+	log.LogMessage("third message")
+	log.LogDebug("Debug message")
+	log.LogWarning("Warning Will Robinson")
+	log.LogPass("Test Passed")
+	log.LogFail("Test Failed")
+	log.LogError("Failure in script")
 
 	time.Sleep(time.Second * 1)
 }
