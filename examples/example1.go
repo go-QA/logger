@@ -31,7 +31,7 @@ func main() {
 	if err != nil { panic(err) }
 	defer resultLog.Close()
 
-	log := goQA.GoQALog{}
+	log := logger.GoQALog{}
 	log.Init()
 	log.SetDebug(true)
 
