@@ -40,7 +40,7 @@ Create a log object and call the `Init()` method:
 	log.SetDebug(true)
 ```
 
-  Add logs to log object using `Add(name string, level uint64, stream io.Writer)` Now we have for log files and output to `os.Stdout`
+  Add logs to log object using `Add(name string, level uint64, stream io.Writer)` Now we have four log files and output to `os.Stdout`
 ```go
 	log.Add("default", logger.LOGLEVEL_ALL, os.Stdout)
 	log.Add("Console", logger.LOGLEVEL_MESSAGE, console)
