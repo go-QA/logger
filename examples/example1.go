@@ -7,7 +7,7 @@ import (
 	"os"
 	"runtime"
 	//"io"
-	"time"
+	//"time"
 	//"net"
 	//"encoding/json"
 	"github.com/go-QA/logger"
@@ -39,7 +39,7 @@ func main() {
 	log.Add("Console", logger.LOGLEVEL_MESSAGE, console)
 	log.Add("Error", logger.LOGLEVEL_ERROR, errLog)
 	log.Add("Incidents", logger.LOGLEVEL_WARNING, incedentLog)
-	log.Add("Resuts", logger.LOGLEVEL_PASS_FAIL, resultLog)
+	log.Add("Resuts", logger.LOGLEVEL_RESULTS, resultLog)
 
 	log.LogMessage("running on platform %s", runtime.GOOS)
 	log.LogMessage("First message")
@@ -51,5 +51,4 @@ func main() {
 	log.LogFail("Test Failed")
 	log.LogError("Failure in script")
 
-	time.Sleep(time.Second * 1)
 }

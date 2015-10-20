@@ -25,7 +25,8 @@ const (
 	LOGLEVEL_DEBUG = (1 << iota)
 	LOGLEVEL_MESSAGE
 	LOGLEVEL_WARNING
-	LOGLEVEL_PASS_FAIL
+	LOGLEVEL_FAIL
+	LOGLEVEL_RESULTS
 	LOGLEVEL_ERROR
 	LOGLEVEL_ALL
 )
@@ -71,7 +72,9 @@ func (log *logStream) Init(debug bool) {
 				log.logger.Printf(message.pattern, message.args...)
 			case (loggerLevel == LOGLEVEL_ERROR) && (mesLevel == log_ERROR):
 				log.logger.Printf(message.pattern, message.args...)
-			case (loggerLevel == uint64(LOGLEVEL_PASS_FAIL)) && ((mesLevel & (log_PASS | log_FAIL)) != 0):
+			case (loggerLevel == uint64(LOGLEVEL_RESULTS)) && ((mesLevel & (log_PASS | log_FAIL)) != 0):
+				log.logger.Printf(message.pattern, message.args...)
+			case loggerLevel == uint64(LOGLEVEL_FAIL) && mesLevel == log_FAIL:
 				log.logger.Printf(message.pattern, message.args...)
 			}
 		}
