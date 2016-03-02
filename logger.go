@@ -20,25 +20,16 @@ const (
 	LOG_SYNC_DELAY = 2
 )
 
-const LOGLEVEL_NOT_SET = 0
+const LOG_LEVEL_NOT_SET = 0
 const (
-	LOGLEVEL_DEBUG = (1 << iota)
-	LOGLEVEL_MESSAGE
-	LOGLEVEL_WARNING
-	LOGLEVEL_FAIL
-	LOGLEVEL_RESULTS
-	LOGLEVEL_ERROR
-	LOGLEVEL_ALL
-)
-
-const log_UNKNOWN = 0
-const (
-	log_DEBUG = (1 << iota)
-	log_MESSAGE
-	log_WARNING
-	log_PASS
-	log_FAIL
-	log_ERROR
+	LOG_LEVEL_DEBUG = (1 << iota)
+	LOG_LEVEL_MESSAGE
+	LOG_LEVEL_WARNING
+	LOG_LEVEL_PASS
+	LOG_LEVEL_FAIL
+	LOG_LEVEL_RESULTS
+	LOG_LEVEL_ERROR
+	LOG_LEVEL_ALL
 )
 
 type logArg struct {
@@ -59,24 +50,7 @@ func (log *logStream) Init(debug bool) {
 
 	go func(bool) {
 		for message := range log.ChnLogInput {
-			loggerLevel := log.level
-			mesLevel := message.level
-			switch {
-			case loggerLevel == uint64(LOGLEVEL_ALL):
-				log.logger.Printf(message.pattern, message.args...)
-			case (loggerLevel == LOGLEVEL_MESSAGE):
-				if (mesLevel != log_DEBUG) || ((mesLevel == log_DEBUG) && (debug == true)) {
-					log.logger.Printf(message.pattern, message.args...)
-				}
-			case (loggerLevel == uint64(LOGLEVEL_WARNING)) && ((mesLevel & (log_WARNING | log_ERROR)) != 0):
-				log.logger.Printf(message.pattern, message.args...)
-			case (loggerLevel == LOGLEVEL_ERROR) && (mesLevel == log_ERROR):
-				log.logger.Printf(message.pattern, message.args...)
-			case (loggerLevel == uint64(LOGLEVEL_RESULTS)) && ((mesLevel & (log_PASS | log_FAIL)) != 0):
-				log.logger.Printf(message.pattern, message.args...)
-			case loggerLevel == uint64(LOGLEVEL_FAIL) && mesLevel == log_FAIL:
-				log.logger.Printf(message.pattern, message.args...)
-			}
+			log.logger.Printf(message.pattern, message.args...)
 		}
 	}(debug)
 
@@ -121,7 +95,25 @@ func (gLog *GoQALog) Init() {
 	go func() {
 		for message := range gLog.chnInput {
 			for _, logger := range gLog.loggers {
-				logger.ChnLogInput <- message
+
+				if ((message.level & LOG_LEVEL_DEBUG) != 0) &&
+					((logger.level&(LOG_LEVEL_MESSAGE|LOG_LEVEL_ALL) != 0) && gLog.debugMode) {
+					logger.ChnLogInput <- message
+				}
+
+				if (logger.level & LOG_LEVEL_ALL) != 0 {
+					logger.ChnLogInput <- message
+				}
+
+				if ((logger.level & LOG_LEVEL_RESULTS) != 0) &&
+					(message.level&(LOG_LEVEL_PASS|LOG_LEVEL_FAIL) != 0) {
+					logger.ChnLogInput <- message
+				}
+
+				log_Level := uint64(message.level & logger.level)
+				if log_Level != 0 {
+					logger.ChnLogInput <- message
+				}
 			}
 		}
 	}()
@@ -173,38 +165,38 @@ func (gLog *GoQALog) SetDebug(mode bool) {
 
 func (gLog *GoQALog) LogError(errMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(log_ERROR, fmt.Sprintf("ERROR::%s%s", errMsg, gLog.END), args...)
+		gLog.Printf(LOG_LEVEL_ERROR, fmt.Sprintf("ERROR::%s%s", errMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogDebug(DebugMsg string, args ...interface{}) {
 	if gLog.ready() {
 		if gLog.debugMode {
-			gLog.Printf(log_DEBUG, fmt.Sprintf("DEBUG::%s%s", DebugMsg, gLog.END), args...)
+			gLog.Printf(LOG_LEVEL_DEBUG, fmt.Sprintf("DEBUG::%s%s", DebugMsg, gLog.END), args...)
 		}
 	}
 }
 
 func (gLog *GoQALog) LogWarning(warnMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(log_WARNING, fmt.Sprintf("ERROR::%s%s", warnMsg, gLog.END), args...)
+		gLog.Printf(LOG_LEVEL_WARNING, fmt.Sprintf("ERROR::%s%s", warnMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogPass(passMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(log_PASS, fmt.Sprintf("PASS::%s%s", passMsg, gLog.END), args...)
+		gLog.Printf(LOG_LEVEL_PASS, fmt.Sprintf("PASS::%s%s", passMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogFail(failMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(log_FAIL, fmt.Sprintf("FAIL::%s%s", failMsg, gLog.END), args...)
+		gLog.Printf(LOG_LEVEL_FAIL, fmt.Sprintf("FAIL::%s%s", failMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogMessage(msg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(log_MESSAGE, fmt.Sprintf("MSG::%s%s", msg, gLog.END), args...)
+		gLog.Printf(LOG_LEVEL_MESSAGE, fmt.Sprintf("MSG::%s%s", msg, gLog.END), args...)
 	}
 }
