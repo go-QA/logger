@@ -99,20 +99,24 @@ func (gLog *GoQALog) Init() {
 				if ((message.level & LOG_LEVEL_DEBUG) != 0) &&
 					((logger.level&(LOG_LEVEL_MESSAGE|LOG_LEVEL_ALL) != 0) && gLog.debugMode) {
 					logger.ChnLogInput <- message
+					continue
 				}
 
 				if (logger.level & LOG_LEVEL_ALL) != 0 {
 					logger.ChnLogInput <- message
+					continue
 				}
 
 				if ((logger.level & LOG_LEVEL_RESULTS) != 0) &&
 					(message.level&(LOG_LEVEL_PASS|LOG_LEVEL_FAIL) != 0) {
 					logger.ChnLogInput <- message
+					continue
 				}
 
 				log_Level := uint64(message.level & logger.level)
 				if log_Level != 0 {
 					logger.ChnLogInput <- message
+					continue
 				}
 			}
 		}
