@@ -167,6 +167,11 @@ func (gLog *GoQALog) SetDebug(mode bool) {
 	}
 }
 
+func (gLog *GoQALog) IsDebugSet() bool {
+
+	return gLog.debugMode
+}
+
 func (gLog *GoQALog) LogError(errMsg string, args ...interface{}) {
 	if gLog.ready() {
 		gLog.Printf(LOG_LEVEL_ERROR, fmt.Sprintf("ERROR::%s%s", errMsg, gLog.END), args...)
