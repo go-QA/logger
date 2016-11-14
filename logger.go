@@ -44,15 +44,15 @@ type logStream struct {
 	logger      log.Logger
 }
 
-func (log *logStream) Init(debug bool) {
+func (log *logStream) Start() {
 
 	log.ChnLogInput = make(chan logArg, LOG_QUEUE_SIZE)
 
-	go func(bool) {
+	go func() {
 		for message := range log.ChnLogInput {
 			log.logger.Printf(message.pattern, message.args...)
 		}
-	}(debug)
+	}()
 
 }
 
@@ -99,20 +99,24 @@ func (gLog *GoQALog) Init() {
 				if ((message.level & LOG_LEVEL_DEBUG) != 0) &&
 					((logger.level&(LOG_LEVEL_MESSAGE|LOG_LEVEL_ALL) != 0) && gLog.debugMode) {
 					logger.ChnLogInput <- message
+					//continue
 				}
 
 				if (logger.level & LOG_LEVEL_ALL) != 0 {
 					logger.ChnLogInput <- message
+					//continue
 				}
 
 				if ((logger.level & LOG_LEVEL_RESULTS) != 0) &&
 					(message.level&(LOG_LEVEL_PASS|LOG_LEVEL_FAIL) != 0) {
 					logger.ChnLogInput <- message
+					//continue
 				}
 
 				log_Level := uint64(message.level & logger.level)
 				if log_Level != 0 {
 					logger.ChnLogInput <- message
+					//continue
 				}
 			}
 		}
@@ -136,7 +140,7 @@ func (gLog *GoQALog) Add(name string, level uint64, stream io.Writer) {
 	}
 	if _, ok := gLog.loggers[name]; !ok {
 		stream := logStream{level: level, logger: *log.New(stream, "", log.Ldate|log.Ltime|log.Lmicroseconds)}
-		stream.Init(gLog.debugMode)
+		stream.Start()
 		gLog.loggers[name] = stream
 	}
 }
@@ -146,6 +150,8 @@ func (gLog *GoQALog) Printf(level uint64, value string, args ...interface{}) {
 	gLog.chnInput <- arg
 }
 
+// Sync will block until all messages have been sent to all log streams
+// and all log streams have cleared there channels.
 func (gLog *GoQALog) Sync() {
 	if !gLog.ready() {
 		return

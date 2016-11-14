@@ -59,4 +59,6 @@ func main() {
 	log.LogFail("Test Failed")
 	log.LogError("Failure in script")
 
+	log.Sync()
+
 }
