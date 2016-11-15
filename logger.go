@@ -22,14 +22,14 @@ const (
 
 const LOG_LEVEL_NOT_SET = 0
 const (
-	LOG_LEVEL_DEBUG = (1 << iota)
-	LOG_LEVEL_MESSAGE
-	LOG_LEVEL_WARNING
-	LOG_LEVEL_PASS
-	LOG_LEVEL_FAIL
-	LOG_LEVEL_RESULTS
-	LOG_LEVEL_ERROR
-	LOG_LEVEL_ALL
+	LogLevelDebug = (1 << iota)
+	LogLevelMessage
+	LogLevelWarning
+	LogLevelPass
+	LogLevelFail
+	LogLevelResults
+	LogLevelError
+	LogLevelAll
 )
 
 type logArg struct {
@@ -96,19 +96,19 @@ func (gLog *GoQALog) Init() {
 		for message := range gLog.chnInput {
 			for _, logger := range gLog.loggers {
 
-				if ((message.level & LOG_LEVEL_DEBUG) != 0) &&
-					((logger.level&(LOG_LEVEL_MESSAGE|LOG_LEVEL_ALL) != 0) && gLog.debugMode) {
+				if ((message.level & LogLevelDebug) != 0) &&
+					((logger.level&(LogLevelMessage|LogLevelAll) != 0) && gLog.debugMode) {
 					logger.ChnLogInput <- message
 					continue
 				}
 
-				if (logger.level & LOG_LEVEL_ALL) != 0 {
+				if (logger.level & LogLevelAll) != 0 {
 					logger.ChnLogInput <- message
 					continue
 				}
 
-				if ((logger.level & LOG_LEVEL_RESULTS) != 0) &&
-					(message.level&(LOG_LEVEL_PASS|LOG_LEVEL_FAIL) != 0) {
+				if ((logger.level & LogLevelResults) != 0) &&
+					(message.level&(LogLevelPass|LogLevelFail) != 0) {
 					logger.ChnLogInput <- message
 					continue
 				}
@@ -176,38 +176,38 @@ func (gLog *GoQALog) IsDebugSet() bool {
 
 func (gLog *GoQALog) LogError(errMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(LOG_LEVEL_ERROR, fmt.Sprintf("ERROR::%s%s", errMsg, gLog.END), args...)
+		gLog.Printf(LogLevelError, fmt.Sprintf("ERROR::%s%s", errMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogDebug(DebugMsg string, args ...interface{}) {
 	if gLog.ready() {
 		if gLog.debugMode {
-			gLog.Printf(LOG_LEVEL_DEBUG, fmt.Sprintf("DEBUG::%s%s", DebugMsg, gLog.END), args...)
+			gLog.Printf(LogLevelDebug, fmt.Sprintf("DEBUG::%s%s", DebugMsg, gLog.END), args...)
 		}
 	}
 }
 
 func (gLog *GoQALog) LogWarning(warnMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(LOG_LEVEL_WARNING, fmt.Sprintf("ERROR::%s%s", warnMsg, gLog.END), args...)
+		gLog.Printf(LogLevelWarning, fmt.Sprintf("ERROR::%s%s", warnMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogPass(passMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(LOG_LEVEL_PASS, fmt.Sprintf("PASS::%s%s", passMsg, gLog.END), args...)
+		gLog.Printf(LogLevelPass, fmt.Sprintf("PASS::%s%s", passMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogFail(failMsg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(LOG_LEVEL_FAIL, fmt.Sprintf("FAIL::%s%s", failMsg, gLog.END), args...)
+		gLog.Printf(LogLevelFail, fmt.Sprintf("FAIL::%s%s", failMsg, gLog.END), args...)
 	}
 }
 
 func (gLog *GoQALog) LogMessage(msg string, args ...interface{}) {
 	if gLog.ready() {
-		gLog.Printf(LOG_LEVEL_MESSAGE, fmt.Sprintf("MSG::%s%s", msg, gLog.END), args...)
+		gLog.Printf(LogLevelMessage, fmt.Sprintf("MSG::%s%s", msg, gLog.END), args...)
 	}
 }

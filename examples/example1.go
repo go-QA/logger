@@ -43,11 +43,11 @@ func main() {
 	log.Init()
 	log.SetDebug(true)
 
-	log.Add("default", logger.LOG_LEVEL_ALL, os.Stdout)
-	log.Add("Console", logger.LOG_LEVEL_MESSAGE, console)
-	log.Add("Error", logger.LOG_LEVEL_ERROR, errLog)
-	log.Add("Incidents", logger.LOG_LEVEL_WARNING, incedentLog)
-	log.Add("Resuts", logger.LOG_LEVEL_RESULTS, resultLog)
+	log.Add("default", logger.LogLevelAll, os.Stdout)
+	log.Add("Console", logger.LogLevelMessage, console)
+	log.Add("Error", logger.LogLevelError, errLog)
+	log.Add("Incidents", logger.LogLevelWarning, incedentLog)
+	log.Add("Resuts", logger.LogLevelResults, resultLog)
 
 	log.LogMessage("running on platform %s", runtime.GOOS)
 	log.LogMessage("First message")
